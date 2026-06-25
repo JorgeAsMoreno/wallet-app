@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import type {
-  ContactsResponse,
-  CreateContactRequest,
-  CreateContactResponse,
+import {
+  ApiErrorCode,
+  type ContactsResponse,
+  type CreateContactRequest,
+  type CreateContactResponse,
 } from '@/core/api/contracts';
 import { newContactSchema } from '@/features/transactions/schema';
 import { MOCK_CONTACTS } from '@/mocks/data';
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { code: 'VALIDATION_ERROR', message: parsed.error.issues[0]?.message ?? 'Datos inválidos' },
+      { code: ApiErrorCode.ValidationError, message: parsed.error.issues[0]?.message ?? 'Datos inválidos' },
       { status: 422 },
     );
   }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import type { TransferRequest, TransferResponse } from '@/core/api/contracts';
+import { ApiErrorCode, type TransferRequest, type TransferResponse } from '@/core/api/contracts';
 import { cents } from '@/core/money';
 import { MOCK_ACCOUNT, MOCK_CONTACTS } from '@/mocks/data';
 import { simulateDelay, mockId, pickTransferScenario } from '@/mocks/utils';
@@ -12,17 +12,17 @@ export async function POST(request: Request) {
   // Timeout: no respondemos, el cliente debe manejar el AbortController
   if (scenario === 'timeout') {
     await simulateDelay(15000);
-    return NextResponse.json({ code: 'TIMEOUT', message: 'Tiempo de espera agotado' }, { status: 408 });
+    return NextResponse.json({ code: ApiErrorCode.Timeout, message: 'Tiempo de espera agotado' }, { status: 408 });
   }
 
   await simulateDelay(1200);
 
   if (scenario === 'network_error') {
-    return NextResponse.json({ code: 'NETWORK_ERROR', message: 'Error de red' }, { status: 503 });
+    return NextResponse.json({ code: ApiErrorCode.NetworkError, message: 'Error de red' }, { status: 503 });
   }
 
   if (scenario === 'unknown_error') {
-    return NextResponse.json({ code: 'UNKNOWN_ERROR', message: 'Error inesperado' }, { status: 500 });
+    return NextResponse.json({ code: ApiErrorCode.UnknownError, message: 'Error inesperado' }, { status: 500 });
   }
 
   // --- Validación de negocio en el servidor (defense in depth) ---
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     if (hasFunds && hasFunds.code === 'INSUFFICIENT_FUNDS') {
       return NextResponse.json(
         {
-          code: 'INSUFFICIENT_FUNDS',
+          code: ApiErrorCode.InsufficientFunds,
           message: 'Saldo insuficiente',
           available: hasFunds.available,
           requested: hasFunds.requested,
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       );
     }
     return NextResponse.json(
-      { code: 'VALIDATION_ERROR', message: 'Datos de transferencia inválidos' },
+      { code: ApiErrorCode.ValidationError, message: 'Datos de transferencia inválidos' },
       { status: 422 },
     );
   }
