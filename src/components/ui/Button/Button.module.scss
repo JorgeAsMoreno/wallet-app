@@ -9,12 +9,18 @@
   border-radius: var(--radius-md);
   font-size: var(--text-base);
   font-weight: var(--font-semibold);
-  transition: opacity var(--transition-fast), background-color var(--transition-fast);
+  transition: background-color var(--transition-fast),
+    box-shadow var(--transition-fast), transform var(--transition-fast),
+    opacity var(--transition-fast);
   width: 100%;
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
   }
 
   &:focus-visible {
@@ -25,9 +31,11 @@
 .primary {
   background-color: var(--color-primary-600);
   color: #ffffff;
+  box-shadow: var(--shadow-sm);
 
   &:hover:not(:disabled) {
     background-color: var(--color-primary-700);
+    box-shadow: var(--shadow-md);
   }
 }
 

@@ -1,10 +1,25 @@
 @use '@/styles/mixins' as *;
 
 .card {
-  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+  position: relative;
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700));
   border-radius: var(--radius-xl);
   padding: var(--space-6);
   color: #ffffff;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+
+  // Brillo sutil en la esquina para dar profundidad a la tarjeta
+  &::after {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgb(255 255 255 / 0.18), transparent 70%);
+    pointer-events: none;
+  }
 }
 
 .label {
