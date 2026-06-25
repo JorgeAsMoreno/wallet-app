@@ -5,11 +5,14 @@
  * - Normalización de errores HTTP a excepciones tipadas
  */
 
+import { ApiErrorCode } from '@/core/api/contracts';
+
 export class HttpError extends Error {
   constructor(
     public readonly status: number,
     public readonly code: string,
     message: string,
+    public readonly body: unknown = undefined,
   ) {
     super(message);
     this.name = 'HttpError';
@@ -59,8 +62,9 @@ export async function httpClient<T>(
       const errorBody = await response.json().catch(() => ({}));
       throw new HttpError(
         response.status,
-        errorBody.code ?? 'HTTP_ERROR',
+        errorBody.code ?? ApiErrorCode.HttpError,
         errorBody.message ?? `HTTP ${response.status}`,
+        errorBody,
       );
     }
 

@@ -3,9 +3,25 @@ import type { Session } from '@/features/auth/domain/types';
 import type { Account, Movement } from '@/features/wallet/domain/types';
 import type { Contact, Receipt } from '@/features/transactions/domain/types';
 
+/** Códigos de error que cruzan la frontera servidor↔cliente. Fuente única de verdad. */
+export enum ApiErrorCode {
+  InsufficientFunds = 'INSUFFICIENT_FUNDS',
+  ValidationError = 'VALIDATION_ERROR',
+  NetworkError = 'NETWORK_ERROR',
+  Timeout = 'TIMEOUT',
+  UnknownError = 'UNKNOWN_ERROR',
+  HttpError = 'HTTP_ERROR',
+}
+
 export interface ApiError {
   code: string;
   message: string;
+}
+
+export interface InsufficientFundsErrorBody extends ApiError {
+  code: ApiErrorCode.InsufficientFunds;
+  available: number;
+  requested: number;
 }
 
 export interface LoginRequest {

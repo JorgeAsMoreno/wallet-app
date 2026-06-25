@@ -1,7 +1,13 @@
+import { z } from 'zod';
 import type { TransferOutcome } from './types';
-import type { TransferResponse } from '@/core/api/contracts';
+import { ApiErrorCode, type TransferResponse } from '@/core/api/contracts';
 import { HttpError, NetworkError, TimeoutError } from '@/core/http/client';
 import { cents } from '@/core/money';
+
+const insufficientFundsBody = z.object({
+  available: z.number(),
+  requested: z.number(),
+});
 
 /**
  * Normaliza cualquier resultado del intento de transferencia (éxito, error HTTP,
@@ -32,11 +38,12 @@ export function mapToTransferOutcome(
   }
 
   if (error instanceof HttpError) {
-    if (error.code === 'INSUFFICIENT_FUNDS') {
+    if (error.code === ApiErrorCode.InsufficientFunds) {
+      const parsed = insufficientFundsBody.safeParse(error.body);
       return {
         status: 'insufficient_funds',
-        available: cents((error as any).available ?? 0),
-        requested: cents((error as any).requested ?? 0),
+        available: cents(parsed.success ? parsed.data.available : 0),
+        requested: cents(parsed.success ? parsed.data.requested : 0),
       };
     }
     if (error.status >= 500 || error.status === 503) {

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import type { LoginRequest, LoginResponse } from '@/core/api/contracts';
+import { ApiErrorCode, type LoginRequest, type LoginResponse } from '@/core/api/contracts';
 import { loginSchema } from '@/features/auth/schema';
 import { MOCK_SESSION } from '@/mocks/data';
 import { simulateDelay } from '@/mocks/utils';
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
 
   if (!parsed.success) {
     return NextResponse.json(
-      { code: 'VALIDATION_ERROR', message: parsed.error.issues[0]?.message ?? 'Datos inválidos' },
+      { code: ApiErrorCode.ValidationError, message: parsed.error.issues[0]?.message ?? 'Datos inválidos' },
       { status: 422 },
     );
   }
