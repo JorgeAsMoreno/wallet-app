@@ -1,0 +1,32 @@
+@use '@/styles/mixins' as *;
+
+.card {
+  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  color: #ffffff;
+}
+
+.label {
+  font-size: var(--text-sm);
+  opacity: 0.85;
+  margin-bottom: var(--space-2);
+}
+
+.balance {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-1);
+}
+
+.holder {
+  font-size: var(--text-sm);
+  opacity: 0.75;
+}
+
+.skeletonWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
