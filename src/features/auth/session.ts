@@ -1,6 +1,7 @@
 /**
  * Helpers para leer/escribir la sesión mockeada en una cookie.
- * Se usan tanto en el middleware (Edge) como en Server Components.
+ * `parseSessionCookie` se usa en el layout del grupo (app) (Server Component) y
+ * `serializeSession` al iniciar sesión; el middleware (Edge) solo checa presencia.
  * Cookie simple en lugar de JWT real — suficiente para el reto.
  */
 

@@ -13,9 +13,11 @@ import { BalanceCard } from '@/components/ui/BalanceCard/BalanceCard';
 export default function HomePage() {
   const router = useRouter();
   const session = useAuthStore((s) => s.session);
+  const clearSession = useAuthStore((s) => s.clearSession);
 
   const handleLogout = () => {
     document.cookie = `${SESSION_COOKIE}=; path=/; max-age=0`;
+    clearSession();
     router.push('/login');
   };
 
