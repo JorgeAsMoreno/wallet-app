@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { useTransferStore } from '@/features/transactions/store/transferStore';
@@ -14,7 +15,15 @@ const STEP_ORDER = ['amount', 'contact', 'summary', 'result'] as const;
 
 export default function TransferPage() {
   const step = useTransferStore((s) => s.step);
+  const reset = useTransferStore((s) => s.reset);
   const currentIndex = STEP_ORDER.indexOf(step);
+
+  // El store del wizard es global de módulo: al salir del flujo lo limpiamos
+  // para que la próxima entrada arranque siempre en el paso inicial, sin
+  // datos stale ni parpadeo de un paso anterior.
+  useEffect(() => {
+    return () => reset();
+  }, [reset]);
 
   return (
     <main className={styles.page}>
