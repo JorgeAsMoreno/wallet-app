@@ -1,0 +1,47 @@
+import type { Cents } from '@/core/money';
+import type { Session } from '@/features/auth/domain/types';
+import type { Account, Movement } from '@/features/wallet/domain/types';
+import type { Contact, Receipt } from '@/features/transactions/domain/types';
+
+export interface ApiError {
+  code: string;
+  message: string;
+}
+
+export interface LoginRequest {
+  identifier: string;
+}
+export interface LoginResponse {
+  session: Session;
+}
+
+export interface AccountResponse {
+  account: Account;
+}
+
+export interface MovementsResponse {
+  items: Movement[];
+  nextCursor: string | null;
+}
+
+export interface ContactsResponse {
+  contacts: Contact[];
+}
+
+export interface CreateContactRequest {
+  name: string;
+  identifier: string;
+}
+export interface CreateContactResponse {
+  contact: Contact;
+}
+
+export interface TransferRequest {
+  amount: Cents;
+  recipientId: string;
+  idempotencyKey: string;
+}
+
+export interface TransferResponse {
+  receipt: Receipt;
+}
