@@ -115,22 +115,23 @@ El proyecto sigue una **arquitectura modular por feature con capas (clean-lite)*
 
 **Next.js 16 con App Router.** La elección de App Router sobre Pages Router se basa en tres ventajas concretas para este proyecto:
 
-1. **Server Components** permiten renderizar HTML en el servidor con datos sin enviar JavaScript al cliente. El Home aprovecha esto para el first paint personalizado.
+1. **Server Components** permiten ejecutar lógica en el servidor sin enviar JavaScript al cliente. El layout del grupo `(app)` (`src/app/(app)/layout.tsx`) es un Server Component que lee la cookie de sesión con `cookies()`, valida su expiración y redirige antes de renderizar — el gate de autenticación ocurre en el servidor, no en el cliente.
 2. **Layouts anidados** con grupos de rutas `(auth)` y `(app)` permiten separar la estructura de login del área protegida sin afectar las URLs.
 3. **`error.tsx` / `loading.tsx` / `not-found.tsx`** por ruta convierten el manejo de estados en convención del framework, no código custom.
 
 **Turbopack** como bundler por defecto (estable desde Next.js 16). Arranque en < 1 segundo en desarrollo, HMR prácticamente instantáneo.
 
-**Estrategia de rendering híbrida, justificada por pantalla:**
+**Estrategia de rendering combinada, justificada por capa:**
 
-| Pantalla | Estrategia | Justificación |
+| Pantalla / capa | Estrategia | Justificación |
 |----------|-----------|---------------|
-| Login | CSR | Sin datos personalizados ni SEO. El formulario es puramente interactivo. |
-| Home | CSR con React Query | Los datos dependen de la sesión activa. React Query maneja cache, revalidación y estados de carga. |
-| Transfer | CSR puro | Wizard altamente interactivo. Todo depende del input del usuario en tiempo real. |
-| Confirmación | CSR | El resultado viene de una mutación; no hay nada que pre-renderizar. |
+| Login | Static (prerender) | Sin datos personalizados ni SEO; el formulario es puramente interactivo. |
+| Layout `(app)` | **SSR** (Server Component) | Lee la cookie, gatea la autenticación y valida la expiración antes de enviar JS de cliente. Hace `/` y `/transfer` dinámicos (server-rendered on demand). |
+| Home (datos) | CSR + React Query | Saldo, movimientos y contactos: datos por-usuario, auth-gated y que cambian seguido. React Query da cache, revalidación y estados loading/error. |
+| Transfer (wizard) | CSR puro | Interactividad en tiempo real; nada que pre-renderizar. |
+| Confirmación | CSR | El resultado viene de una mutación. |
 
-> **Trade-off documentado:** el Home podría implementarse con SSR puro leyendo la cookie en un Server Component para el first paint. Se eligió CSR con React Query para mantener la consistencia del patrón y hacer explícito el manejo de loading/error que el reto evalúa. Ambas decisiones son defendibles.
+> **Por qué este split (ni full-SSR ni full-CSR):** SSR se usa donde aporta — el *boundary* de autenticación (gate + identidad resueltos en el servidor). Los datos personalizados y cambiantes van en CSR + React Query: SSR-earlos significaría renderizar y fetchear en el servidor en *cada* request por datos que el cliente igual revalida, subiendo costo y TTFB sin ganancia real (no hay SEO detrás de auth). La única mejora combinada pendiente —**opcional**— sería prefetchear el **saldo** en el servidor (RSC + `HydrationBoundary`) para eliminar el waterfall del dato más crítico above-the-fold, dejando movimientos y contactos en cliente. Full SSR del wizard o de las listas sería sobre-ingeniería para este caso.
 
 ---
 
@@ -172,7 +173,7 @@ Usar Context + `useEffect` + `useState` para esto sería reinventar caché de fo
 El wizard de transferencia (paso actual, monto seleccionado, contacto, outcome) vive en un store de Zustand. Es estado que:
 - No viene del servidor
 - Necesita sobrevivir navegación entre pasos
-- Debe resetearse al terminar el flujo
+- Se resetea al **salir** del flujo (unmount de la página), para que cada entrada arranque limpia
 
 Zustand sobre Redux Toolkit: el alcance del estado no justifica la ceremonia de RTK (actions, reducers, slices, middleware). Zustand es más simple, tipado nativo, y fácil de testear.
 
@@ -215,6 +216,7 @@ El mismo schema de Zod valida en el formulario (cliente) y en el route handler (
 1. **Timeout via `AbortController`**: configurable por endpoint, 10 segundos por defecto. El endpoint de transfer usa 12 segundos para dar margen al mock de delay.
 2. **Tipado genérico**: `httpClient<T>(url, options)` retorna `Promise<T>`, eliminando casteos en los consumers.
 3. **Normalización de errores** a tres clases tipadas: `HttpError`, `NetworkError`, `TimeoutError`. Los consumers nunca manejan errores HTTP crudos — el mapper los convierte al `TransferOutcome` del dominio.
+4. **Preservación del body de error**: `HttpError` conserva el body JSON ya parseado (`error.body`), de modo que el mapper pueda extraer campos estructurados del error (p. ej. `available`/`requested` en fondos insuficientes) con narrow seguro vía Zod — sin `as any` ni perder datos por el camino.
 
 ---
 
@@ -287,6 +289,7 @@ wallet-app/
 │   │   │       ├── page.tsx          # Pantalla de login (CSR)
 │   │   │       └── page.module.scss
 │   │   ├── (app)/                    # Route group área protegida
+│   │   │   ├── layout.tsx            # Server Component: gate de auth + hidratación de sesión
 │   │   │   ├── page.tsx              # Home
 │   │   │   ├── page.module.scss
 │   │   │   └── transfer/
@@ -313,6 +316,8 @@ wallet-app/
 │   │   │   ├── schema.ts             # loginSchema
 │   │   │   ├── session.ts            # Cookie helpers
 │   │   │   ├── store.ts              # Zustand auth store
+│   │   │   ├── components/
+│   │   │   │   └── AuthHydrator.tsx  # Siembra la sesión del servidor en el store (cliente)
 │   │   │   └── hooks/
 │   │   │       └── useLogin.ts
 │   │   ├── wallet/
@@ -429,9 +434,23 @@ Las funciones que pueden fallar por razones esperadas (parseo, validación) reto
 
 `mapToTransferOutcome()` es el único lugar donde se traduce HTTP (status codes, errores de red, timeouts) al dominio. Los componentes nunca ven HTTP — solo ven `TransferOutcome`. Cambiar el protocolo de transporte no afecta la UI.
 
+### Códigos de error centralizados (enum)
+
+Los códigos de error que cruzan la frontera servidor↔cliente viven en un solo enum, `ApiErrorCode` (`core/api/contracts.ts`), en lugar de strings mágicos duplicados entre los route handlers y el mapper:
+
+```ts
+export enum ApiErrorCode {
+  InsufficientFunds = 'INSUFFICIENT_FUNDS',
+  ValidationError = 'VALIDATION_ERROR',
+  // ...
+}
+```
+
+Fuente única de verdad: un typo entre servidor y cliente deja de ser posible y renombrar un código es un solo lugar. **Frontera deliberada:** el enum aplica solo a los códigos de *transporte*. Las uniones discriminadas de *dominio* (`TransferOutcome.status`, `TransferViolation.code`) se quedan como string-literals — es el patrón idiomático para un `switch` exhaustivo y no cruzan la red.
+
 ### Compound Component (wizard)
 
-El wizard de transferencia es un **state machine implícita** con 4 estados (`amount → contact → summary → result`). El store de Zustand centraliza el estado y las transiciones. La página de transfer solo renderiza el paso activo — cada paso es un componente independiente sin conocimiento de los otros.
+El wizard de transferencia es un **state machine implícita** con 4 estados (`amount → contact → summary → result`). El store de Zustand centraliza el estado y las transiciones. La página de transfer solo renderiza el paso activo — cada paso es un componente independiente sin conocimiento de los otros. Al desmontarse la página se llama `reset()`, así re-entrar al flujo (incluso con back/forward del navegador) siempre empieza en `amount` sin datos stale.
 
 ### Branded Types
 
@@ -552,7 +571,12 @@ Con millones de renders, instanciar el formatter por llamada sería medible en p
         └── ⚠️  unknown_error  → Fallback genérico
 ```
 
-**Protección de rutas:** el `middleware.ts` intercepta todos los requests. Sin cookie de sesión, cualquier ruta protegida redirige a `/login`. Con sesión activa, `/login` redirige a `/`.
+**Protección de rutas (dos capas):**
+
+1. **Middleware (`middleware.ts`, Edge):** intercepta cada request y comprueba la *presencia* de la cookie. Sin cookie, cualquier ruta protegida redirige a `/login`; con sesión activa, `/login` redirige a `/`.
+2. **Layout `(app)` (Server Component):** parsea la cookie real con `parseSessionCookie`, valida la expiración (`expiresAt`) y redirige si la sesión es inválida — defensa en profundidad sobre el middleware.
+
+**Hidratación de sesión:** la cookie es la fuente de verdad en el servidor. El layout pasa la sesión a `AuthHydrator` (Client Component), que la siembra en el store de Zustand. Así la identidad del usuario sobrevive a un refresh duro (antes el store en memoria se reseteaba a `null` y el Home perdía el nombre). El logout limpia **ambos**: borra la cookie y llama `clearSession()` en el store.
 
 ---
 
@@ -626,7 +650,7 @@ React Query expone `isError` y `refetch` — los componentes muestran su estado 
 
 ### En el wizard de transferencia
 
-`mapToTransferOutcome()` normaliza cualquier resultado (éxito o error) al `TransferOutcome` del dominio. `ResultStep` hace un `switch` exhaustivo — cada uno de los 5 escenarios tiene su pantalla específica con mensaje claro y acción de recuperación.
+`mapToTransferOutcome()` normaliza cualquier resultado (éxito o error) al `TransferOutcome` del dominio. `ResultStep` hace un `switch` exhaustivo — cada uno de los 5 escenarios tiene su pantalla específica con mensaje claro y acción de recuperación. En `insufficient_funds`, los montos `available`/`requested` se extraen del body del error validándolo con Zod (`safeParse`); si el body llegara mal, caen a `cents(0)` de forma controlada (antes se descartaban y la pantalla mostraba $0.00).
 
 ### Boundaries por ruta
 
@@ -663,7 +687,7 @@ src/tests/unit/
 │   ├── money.test.ts      # parseAmountToCents, cents, formatMoney, aritmética
 │   ├── rules.test.ts      # validateTransfer + las 3 reglas individuales
 │   ├── schemas.test.ts    # loginSchema, amountSchema, newContactSchema
-│   └── mappers.test.ts    # mapToTransferOutcome (6 escenarios)
+│   └── mappers.test.ts    # mapToTransferOutcome (7 casos: 5 escenarios + montos del body + body ausente)
 └── components/
     └── Button.test.tsx    # render, loading, disabled, onClick
 ```
