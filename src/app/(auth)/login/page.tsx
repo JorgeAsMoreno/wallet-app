@@ -37,7 +37,7 @@ export default function LoginPage() {
             type="text"
             placeholder="ej. +5213121234567 o correo@email.com"
             autoComplete="username"
-            error={errors.identifier?.message as string}
+            error={errors.identifier?.message}
             {...register('identifier')}
           />
 

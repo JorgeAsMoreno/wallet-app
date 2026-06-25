@@ -54,13 +54,13 @@ export function AmountStep() {
     <div className={styles.wrapper}>
       <h2 className={styles.title}>¿Cuánto quieres enviar?</h2>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
         <Input
           id="amount"
           label="Monto"
           placeholder="ej. 150.00"
           inputMode="decimal"
-          error={errors.amount?.message as string}
+          error={errors.amount?.message}
           {...register('amount')}
         />
         {balance !== null && (
@@ -69,7 +69,6 @@ export function AmountStep() {
           </p>
         )}
 
-        <br />
         <Button type="submit">Continuar</Button>
       </form>
     </div>

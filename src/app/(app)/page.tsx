@@ -35,7 +35,7 @@ export default function HomePage() {
 
         <BalanceCard />
 
-        <Link href="/transfer" style={{ display: 'block' }}>
+        <Link href="/transfer" className={styles.transferLink}>
           <Button>Enviar dinero</Button>
         </Link>
 

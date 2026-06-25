@@ -9,7 +9,7 @@ function MovementsSkeleton() {
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className={styles.skeletonItem}>
           <Skeleton width="2.5rem" height="2.5rem" />
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <div className={styles.skeletonText}>
             <Skeleton width="60%" height="0.875rem" />
             <Skeleton width="40%" height="0.75rem" />
           </div>

@@ -1,0 +1,27 @@
+.wrapper {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  text-align: center;
+  background-color: var(--color-background);
+}
+
+.icon {
+  font-size: var(--text-3xl);
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-gray-900);
+}
+
+.description {
+  font-size: var(--text-sm);
+  color: var(--color-gray-600);
+  max-width: 28ch;
+}
