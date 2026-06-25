@@ -3,7 +3,9 @@ import styles from './Input.module.scss';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  error?: string;
+  // `| undefined` explícito: con exactOptionalPropertyTypes permite pasar
+  // directamente errors.x?.message (string | undefined) sin castear.
+  error?: string | undefined;
 }
 
 export function Input({ label, error, id, className, ...props }: InputProps) {

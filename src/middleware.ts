@@ -11,9 +11,7 @@ export function middleware(request: NextRequest) {
 
   // Ruta protegida sin sesión → login
   if (!isPublic && !session) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('next', pathname);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
   // Ya logueado intentando ir a login → home

@@ -41,15 +41,15 @@ export function validateTransfer(
     });
   }
 
-  if (!hasRecipient(candidate.recipient)) {
+  const { recipient } = candidate;
+  if (!hasRecipient(recipient)) {
     violations.push({ code: 'RECIPIENT_REQUIRED' });
   }
 
-  if (violations.length > 0) return err(violations);
-
-  if (!hasRecipient(candidate.recipient)) {
-    return err([{ code: 'RECIPIENT_REQUIRED' }]);
+  // El guard de recipient además estrecha el tipo a Contact para el ok().
+  if (violations.length > 0 || !hasRecipient(recipient)) {
+    return err(violations);
   }
 
-  return ok({ amount: candidate.amount, recipient: candidate.recipient });
+  return ok({ amount: candidate.amount, recipient });
 }

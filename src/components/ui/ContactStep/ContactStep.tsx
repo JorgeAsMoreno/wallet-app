@@ -91,14 +91,14 @@ export function ContactStep() {
             id="name"
             label="Nombre"
             placeholder="ej. Ana García"
-            error={errors.name?.message as string}
+            error={errors.name?.message}
             {...register('name')}
           />
           <Input
             id="identifier"
             label="Teléfono, correo o CLABE"
             placeholder="ej. +5213121234567"
-            error={errors.identifier?.message as string}
+            error={errors.identifier?.message}
             {...register('identifier')}
           />
 
