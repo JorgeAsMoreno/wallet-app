@@ -18,7 +18,7 @@ export function SummaryStep() {
 
   return (
     <div className={styles.wrapper}>
-      <button className={styles.backButton} onClick={() => goTo(WIZARD_STEP.Contact)}>
+      <button className={styles.backButton} disabled={isPending} onClick={() => goTo(WIZARD_STEP.Contact)}>
         ← Volver
       </button>
 
@@ -47,7 +47,7 @@ export function SummaryStep() {
         <Button onClick={handleConfirm} isLoading={isPending}>
           Confirmar envío
         </Button>
-        <Button variant="secondary" onClick={() => goTo(WIZARD_STEP.Contact)}>
+        <Button variant="secondary" disabled={isPending} onClick={() => goTo(WIZARD_STEP.Contact)}>
           Cambiar destinatario
         </Button>
       </div>
