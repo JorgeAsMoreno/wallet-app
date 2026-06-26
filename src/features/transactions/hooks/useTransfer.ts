@@ -9,7 +9,6 @@ import type { Contact } from '../domain/types';
 
 export function useTransfer() {
   const setOutcome = useTransferStore((s) => s.setOutcome);
-  // Estable durante todo el envío: los reintentos reutilizan la misma key.
   const idempotencyKey = useTransferStore((s) => s.idempotencyKey);
 
   return useMutation({
@@ -20,8 +19,6 @@ export function useTransfer() {
       amount: Cents;
       recipient: Contact;
     }) => {
-      // Garantizado al entrar al resumen (setRecipient la genera); el guard
-      // mantiene el tipo y cae al fallback genérico si algo se salta el flujo.
       if (!idempotencyKey) return mapToTransferOutcome(undefined, new Error('missing idempotency key'));
       try {
         const response = await submitTransfer({

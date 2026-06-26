@@ -7,7 +7,7 @@ function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 1000 * 60, // 1 minuto
+        staleTime: 1000 * 60,
         retry: 1,
       },
       mutations: {

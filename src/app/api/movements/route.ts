@@ -7,7 +7,7 @@ export async function GET() {
   await simulateDelay(800);
   const response: MovementsResponse = {
     items: getMovements(),
-    nextCursor: null, // mock sin paginación real, pero el contrato la soporta
+    nextCursor: null,
   };
   return NextResponse.json(response);
 }

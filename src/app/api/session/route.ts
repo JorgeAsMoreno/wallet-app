@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // Mock: cualquier identifier válido inicia sesión correctamente
+  // Mock: any valid identifier logs in successfully
   const response: LoginResponse = { session: MOCK_SESSION };
   return NextResponse.json(response, { status: 200 });
 }

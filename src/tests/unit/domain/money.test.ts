@@ -56,7 +56,7 @@ describe('parseAmountToCents()', () => {
     const b = parseAmountToCents('0.20');
     expect(a.ok && b.ok).toBe(true);
     if (a.ok && b.ok) {
-      expect(addCents(a.value, b.value)).toBe(30); // 30 centavos exactos
+      expect(addCents(a.value, b.value)).toBe(30); // 30 cents
     }
   });
 });

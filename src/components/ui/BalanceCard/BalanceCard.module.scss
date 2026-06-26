@@ -9,7 +9,6 @@
   box-shadow: var(--shadow-lg);
   overflow: hidden;
 
-  // Brillo sutil en la esquina para dar profundidad a la tarjeta
   &::after {
     content: '';
     position: absolute;

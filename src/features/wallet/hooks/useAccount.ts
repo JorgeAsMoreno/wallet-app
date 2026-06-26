@@ -9,6 +9,6 @@ export function useAccount() {
   return useQuery({
     queryKey: accountQueryKey,
     queryFn: fetchAccount,
-    staleTime: 1000 * 30, // 30 segundos
+    staleTime: 1000 * 30,
   });
 }

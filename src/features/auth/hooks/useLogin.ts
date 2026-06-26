@@ -21,9 +21,9 @@ export function useLogin() {
   return useMutation({
     mutationFn: loginRequest,
     onSuccess: ({ session }) => {
-      // Guardar en cookie para middleware + Server Components
+      // Save to cookie for middleware + Server Components
       document.cookie = `${SESSION_COOKIE}=${serializeSession(session)}; path=/; max-age=${60 * 60 * 24}`;
-      // Guardar en store para Client Components
+      // Save in store for Client Components
       setSession(session);
       router.push('/');
     },

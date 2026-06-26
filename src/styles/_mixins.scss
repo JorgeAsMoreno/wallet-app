@@ -1,17 +1,14 @@
 @use 'tokens' as *;
 
-// Breakpoints (mobile-first)
 @mixin sm { @media (min-width: 640px)  { @content; } }
 @mixin md { @media (min-width: 768px)  { @content; } }
 @mixin lg { @media (min-width: 1024px) { @content; } }
 
-// Foco accesible (no outline nativo feo)
 @mixin focus-ring {
   outline: 2px solid var(--color-primary-500);
   outline-offset: 2px;
 }
 
-// Truncar texto a N líneas
 @mixin line-clamp($n) {
   display: -webkit-box;
   -webkit-line-clamp: $n;
@@ -19,7 +16,6 @@
   overflow: hidden;
 }
 
-// Centrar el contenedor de la app (mobile-first wallet)
 @mixin app-container {
   width: 100%;
   max-width: var(--max-width-app);

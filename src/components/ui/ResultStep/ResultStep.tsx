@@ -17,7 +17,7 @@ export function ResultStep() {
   if (!outcome) return null;
 
   const handleGoHome = () => {
-    // Invalidar caché para que el home refresque saldo y movimientos
+    // Invalidate cache so that the home page refreshes balance and movements
     queryClient.invalidateQueries({ queryKey: accountQueryKey });
     queryClient.invalidateQueries({ queryKey: movementsQueryKey });
     reset();
@@ -28,7 +28,6 @@ export function ResultStep() {
     goTo(WIZARD_STEP.Summary);
   };
 
-  // --- Éxito ---
   if (outcome.status === 'success') {
     const { receipt } = outcome;
     return (
@@ -67,7 +66,6 @@ export function ResultStep() {
     );
   }
 
-  // --- Fondos insuficientes ---
   if (outcome.status === 'insufficient_funds') {
     return (
       <div className={styles.wrapper}>
@@ -85,7 +83,6 @@ export function ResultStep() {
     );
   }
 
-  // --- Timeout ---
   if (outcome.status === 'timeout') {
     return (
       <div className={styles.wrapper}>
@@ -103,7 +100,6 @@ export function ResultStep() {
     );
   }
 
-  // --- Error de red ---
   if (outcome.status === 'network_error') {
     return (
       <div className={styles.wrapper}>
@@ -120,7 +116,6 @@ export function ResultStep() {
     );
   }
 
-  // --- Error desconocido (fallback) ---
   return (
     <div className={styles.wrapper}>
       <div className={styles.icon}>⚠️</div>

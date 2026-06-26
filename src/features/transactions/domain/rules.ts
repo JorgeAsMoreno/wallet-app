@@ -46,7 +46,6 @@ export function validateTransfer(
     violations.push({ code: 'RECIPIENT_REQUIRED' });
   }
 
-  // El guard de recipient además estrecha el tipo a Contact para el ok().
   if (violations.length > 0 || !hasRecipient(recipient)) {
     return err(violations);
   }

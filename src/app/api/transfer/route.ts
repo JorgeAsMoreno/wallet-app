@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const body: TransferRequest = await request.json();
   const scenario = pickTransferScenario();
 
-  // Timeout: no respondemos, el cliente debe manejar el AbortController
+  // Timeout: we do not respond, the client must handle the AbortController
   if (scenario === 'timeout') {
     await simulateDelay(15000);
     return NextResponse.json({ code: ApiErrorCode.Timeout, message: 'Tiempo de espera agotado' }, { status: 408 });
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ code: ApiErrorCode.UnknownError, message: 'Error inesperado' }, { status: 500 });
   }
 
-  // --- Validación de negocio en el servidor (defense in depth) ---
+  // --- Business validation on the server (defense in depth) ---
   const recipient = MOCK_CONTACTS.find((c) => c.id === body.recipientId) ?? null;
 
   const validation = validateTransfer({
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // --- Éxito: descontamos el saldo y registramos el movimiento ---
+  // --- Success: we discount the balance and record the movement ---
   applyTransfer(cents(body.amount), validation.value.recipient.name);
 
   const response: TransferResponse = {

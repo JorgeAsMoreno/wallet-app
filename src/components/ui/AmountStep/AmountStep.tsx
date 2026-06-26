@@ -27,8 +27,8 @@ export function AmountStep() {
 
   const amountField = register('amount');
 
-  // Solo permitimos dígitos y un único separador decimal (. o ,).
-  // Filtra en vivo cualquier otro carácter (letras, símbolos, espacios…).
+  // We only allow digits and a single decimal separator (. or ,). 
+  // Live filter any other character (letters, symbols, spaces...).
   const sanitizeAmount: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const cleaned = e.target.value
       .replace(/[^\d.,]/g, '')

@@ -54,7 +54,6 @@ svg {
   max-width: 100%;
 }
 
-// Accesibilidad: mostrar foco solo con teclado
 :focus-visible {
   outline: 2px solid var(--color-primary-500);
   outline-offset: 2px;

@@ -18,9 +18,9 @@ export default function TransferPage() {
   const reset = useTransferStore((s) => s.reset);
   const currentIndex = STEP_ORDER.indexOf(step);
 
-  // El store del wizard es global de módulo: al salir del flujo lo limpiamos
-  // para que la próxima entrada arranque siempre en el paso inicial, sin
-  // datos stale ni parpadeo de un paso anterior.
+  // The wizard store is module global: when we exit the flow we clean it
+  // so that the next entry always starts at the initial step, without
+  // stale data or flashing from a previous step.
   useEffect(() => {
     return () => reset();
   }, [reset]);

@@ -9,12 +9,12 @@ export function middleware(request: NextRequest) {
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
   const session = request.cookies.get(SESSION_COOKIE)?.value;
 
-  // Ruta protegida sin sesión → login
+  // Protected route → login
   if (!isPublic && !session) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Ya logueado intentando ir a login → home
+  // Logged in → home
   if (isPublic && session) {
     return NextResponse.redirect(new URL('/', request.url));
   }

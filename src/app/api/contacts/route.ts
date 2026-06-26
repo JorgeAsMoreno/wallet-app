@@ -9,7 +9,7 @@ import { newContactSchema } from '@/features/transactions/schema';
 import { MOCK_CONTACTS } from '@/mocks/data';
 import { simulateDelay, mockId } from '@/mocks/utils';
 
-// En memoria durante la sesión del servidor (suficiente para el mock)
+// In memory during the server session (enough for the drill)
 const contacts = [...MOCK_CONTACTS];
 
 export async function GET() {

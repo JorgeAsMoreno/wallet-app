@@ -18,7 +18,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // En producción esto iría a un servicio de observabilidad (Sentry, etc.).
+    // In production this would go to an observability service (Sentry, etc.).
     console.error(error);
   }, [error]);
 

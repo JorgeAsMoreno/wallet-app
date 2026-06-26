@@ -4,7 +4,7 @@ import type { Account, Movement } from '@/features/wallet/domain/types';
 import type { Contact } from '@/features/transactions/domain/types';
 
 // ---------------------------------------------------------------------------
-// Usuario y sesión
+// User and session
 // ---------------------------------------------------------------------------
 export const MOCK_USER: User = {
   id: 'user-001',
@@ -20,7 +20,7 @@ export const MOCK_SESSION: Session = {
 };
 
 // ---------------------------------------------------------------------------
-// Cuenta
+// Account
 // ---------------------------------------------------------------------------
 export const MOCK_ACCOUNT: Account = {
   balance: cents(2487500), // $24,875.00 MXN
@@ -29,7 +29,7 @@ export const MOCK_ACCOUNT: Account = {
 };
 
 // ---------------------------------------------------------------------------
-// Movimientos recientes
+// Movements
 // ---------------------------------------------------------------------------
 export const MOCK_MOVEMENTS: Movement[] = [
   {
@@ -80,7 +80,7 @@ export const MOCK_MOVEMENTS: Movement[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Contactos favoritos
+// Contacts
 // ---------------------------------------------------------------------------
 export const MOCK_CONTACTS: Contact[] = [
   {
