@@ -1,13 +1,30 @@
 import { NextResponse } from 'next/server';
-import { ApiErrorCode, type TransferRequest, type TransferResponse } from '@/core/api/contracts';
+import { ApiErrorCode, type TransferResponse } from '@/core/api/contracts';
 import { cents } from '@/core/money';
 import { MOCK_CONTACTS } from '@/mocks/data';
-import { getAccount, applyTransfer } from '@/mocks/state';
+import { getAccount, applyTransfer, getProcessedTransfer, recordTransfer } from '@/mocks/state';
 import { simulateDelay, mockId, pickTransferScenario } from '@/mocks/utils';
 import { validateTransfer } from '@/features/transactions/domain/rules';
+import { transferRequestSchema } from '@/features/transactions/schema';
 
 export async function POST(request: Request) {
-  const body: TransferRequest = await request.json();
+  // Validate the contract first: malformed body → clean 422, never a 500.
+  const parsed = transferRequestSchema.safeParse(await request.json());
+  if (!parsed.success) {
+    return NextResponse.json(
+      { code: ApiErrorCode.ValidationError, message: 'Datos de transferencia inválidos' },
+      { status: 422 },
+    );
+  }
+  const body = parsed.data;
+
+  // Idempotency: a retry of an already-applied transfer returns the same
+  // receipt without charging again (defends against double charges on retry).
+  const alreadyProcessed = getProcessedTransfer(body.idempotencyKey);
+  if (alreadyProcessed) {
+    return NextResponse.json({ receipt: alreadyProcessed }, { status: 200 });
+  }
+
   const scenario = pickTransferScenario();
 
   // Timeout: we do not respond, the client must handle the AbortController
@@ -69,6 +86,8 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
     },
   };
+
+  recordTransfer(body.idempotencyKey, response.receipt);
 
   return NextResponse.json(response, { status: 200 });
 }

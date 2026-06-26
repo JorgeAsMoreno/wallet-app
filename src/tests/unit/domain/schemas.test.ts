@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { loginSchema } from '@/features/auth/schema';
-import { amountSchema, newContactSchema } from '@/features/transactions/schema';
+import {
+  amountSchema,
+  newContactSchema,
+  transferRequestSchema,
+} from '@/features/transactions/schema';
 
 describe('loginSchema', () => {
   it('acepta email válido', () => {
@@ -73,5 +77,33 @@ describe('newContactSchema', () => {
       identifier: '',
     });
     expect(result.success).toBe(false);
+  });
+});
+
+describe('transferRequestSchema', () => {
+  const valid = { amount: 10000, recipientId: 'c1', idempotencyKey: 'k1' };
+
+  it('acepta un body válido', () => {
+    expect(transferRequestSchema.safeParse(valid).success).toBe(true);
+  });
+
+  it('rechaza amount como string', () => {
+    expect(transferRequestSchema.safeParse({ ...valid, amount: '10000' }).success).toBe(false);
+  });
+
+  it('rechaza amount negativo', () => {
+    expect(transferRequestSchema.safeParse({ ...valid, amount: -1 }).success).toBe(false);
+  });
+
+  it('rechaza amount no entero', () => {
+    expect(transferRequestSchema.safeParse({ ...valid, amount: 1.5 }).success).toBe(false);
+  });
+
+  it('rechaza recipientId vacío', () => {
+    expect(transferRequestSchema.safeParse({ ...valid, recipientId: '' }).success).toBe(false);
+  });
+
+  it('rechaza idempotencyKey vacío', () => {
+    expect(transferRequestSchema.safeParse({ ...valid, idempotencyKey: '' }).success).toBe(false);
   });
 });

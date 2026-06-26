@@ -1,30 +1,25 @@
 import { type Cents, subtractCents } from '@/core/money';
 import type { Account, Movement } from '@/features/wallet/domain/types';
+import type { Receipt } from '@/features/transactions/domain/types';
 import { MOCK_ACCOUNT, MOCK_MOVEMENTS } from '@/mocks/data';
 import { mockId } from '@/mocks/utils';
 
-/**
- * Estado mutable en memoria del "servidor" mock. El saldo se descuenta en
- * /api/transfer pero se lee en /api/account (archivos distintos), así que el
- * estado vive aquí, en un único módulo compartido, en lugar de en cada ruta.
- *
- * Limitaciones honestas (es un mock): se reinicia al reiniciar el servidor o
- * con hot-reload, es un único saldo global (no por usuario) y no sería
- * consistente en un despliegue serverless con varias instancias. Suficiente
- * para la demo local.
- */
+
 let account: Account = { ...MOCK_ACCOUNT };
 let movements: Movement[] = [...MOCK_MOVEMENTS];
+
+const processed = new Map<string, Receipt>();
 
 export const getAccount = (): Account => account;
 
 export const getMovements = (): Movement[] => movements;
 
-/**
- * Aplica una transferencia exitosa: descuenta el monto del saldo y registra el
- * movimiento correspondiente al inicio de la lista. Devuelve el movimiento creado.
- * Asume que la validación de saldo suficiente ya ocurrió antes de llamarse.
- */
+export const getProcessedTransfer = (key: string): Receipt | undefined => processed.get(key);
+
+export const recordTransfer = (key: string, receipt: Receipt): void => {
+  processed.set(key, receipt);
+};
+
 export function applyTransfer(amount: Cents, recipientName: string): Movement {
   account = { ...account, balance: subtractCents(account.balance, amount) };
 

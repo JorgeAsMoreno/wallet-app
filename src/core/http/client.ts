@@ -1,10 +1,3 @@
-/**
- * Wrapper de fetch con:
- * - Timeout via AbortController
- * - Tipado de respuesta genérico
- * - Normalización de errores HTTP a excepciones tipadas
- */
-
 import { ApiErrorCode } from '@/core/api/contracts';
 
 export class HttpError extends Error {

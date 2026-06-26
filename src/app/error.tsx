@@ -1,11 +1,5 @@
 'use client';
 
-/**
- * Error boundary global (convención de Next App Router). Captura errores de
- * render no controlados en cualquier ruta y ofrece reintentar sin recargar.
- * Los errores asíncronos de datos los maneja React Query; esto es la última red.
- */
-
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/Button/Button';
 import styles from './error.module.scss';

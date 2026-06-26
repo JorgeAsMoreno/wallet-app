@@ -9,11 +9,6 @@ const insufficientFundsBody = z.object({
   requested: z.number(),
 });
 
-/**
- * Normaliza cualquier resultado del intento de transferencia (éxito, error HTTP,
- * error de red, timeout) al TransferOutcome del dominio. La UI solo ve esta
- * unión discriminada y hace un switch exhaustivo — nunca maneja HTTP directamente.
- */
 export function mapToTransferOutcome(
   result: TransferResponse | unknown,
   error?: unknown,

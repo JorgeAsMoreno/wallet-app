@@ -12,3 +12,9 @@ export const newContactSchema = z.object({
 });
 
 export type NewContactValues = z.infer<typeof newContactSchema>;
+
+export const transferRequestSchema = z.object({
+  amount: z.number().int().nonnegative(),
+  recipientId: z.string().min(1),
+  idempotencyKey: z.string().min(1),
+});

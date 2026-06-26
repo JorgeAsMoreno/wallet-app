@@ -1,10 +1,3 @@
-/**
- * Helpers para leer/escribir la sesión mockeada en una cookie.
- * `parseSessionCookie` se usa en el layout del grupo (app) (Server Component) y
- * `serializeSession` al iniciar sesión; el middleware (Edge) solo checa presencia.
- * Cookie simple en lugar de JWT real — suficiente para el reto.
- */
-
 import type { Session } from './domain/types';
 
 export const SESSION_COOKIE = 'wallet_session' as const;

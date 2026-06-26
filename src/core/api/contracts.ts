@@ -3,7 +3,6 @@ import type { Session } from '@/features/auth/domain/types';
 import type { Account, Movement } from '@/features/wallet/domain/types';
 import type { Contact, Receipt } from '@/features/transactions/domain/types';
 
-/** Códigos de error que cruzan la frontera servidor↔cliente. Fuente única de verdad. */
 export enum ApiErrorCode {
   InsufficientFunds = 'INSUFFICIENT_FUNDS',
   ValidationError = 'VALIDATION_ERROR',
