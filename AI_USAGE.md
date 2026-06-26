@@ -72,5 +72,6 @@ El ciclo que seguí, en orden:
 3. **Usar la IA para acelerar** dentro de esos límites: schemas, lógica del `core/`, componentes de presentación, estilos e investigación de buenas prácticas.
 4. **Revisar, corregir o rechazar** cada salida según criterio propio.
 5. **Consolidar las convenciones en [`AGENTS.md`](AGENTS.md)** para que la IA mantuviera consistencia en todo el código a lo largo del desarrollo.
+6. **Documentar y hacer commits** Me ayudo a crear mis commits mejor documentados con los cambios realizados 
 
 En resumen: con el problema entendido y la arquitectura decidida, la IA fue una herramienta para ir más rápido y contrastar ideas, pero las decisiones de fondo —y el control de calidad— fueron míos.
