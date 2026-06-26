@@ -2,27 +2,16 @@ import { formatMoney } from '@/core/money';
 import { Button } from '@/components/ui/Button/Button';
 import styles from './ResultStep.module.scss';
 import { useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
-import { accountQueryKey } from '@/features/wallet/hooks/useAccount';
-import { movementsQueryKey } from '@/features/wallet/hooks/useMovements';
 import { useTransferStore, WIZARD_STEP } from '@/features/transactions/store/transferStore';
 
 export function ResultStep() {
   const outcome = useTransferStore((s) => s.outcome);
   const goTo = useTransferStore((s) => s.goTo);
   const router = useRouter();
-  const queryClient = useQueryClient();
 
   if (!outcome) return null;
 
   const handleGoHome = () => {
-    // Invalidate cache so that the home page refreshes balance and movements
-    queryClient.invalidateQueries({ queryKey: accountQueryKey });
-    queryClient.invalidateQueries({ queryKey: movementsQueryKey });
-    // Don't reset() here: it would flip `step` back to 'amount' synchronously and
-    // flash the first wizard step before the navigation completes. The store is
-    // already cleaned on TransferPage unmount (see transfer/page.tsx). We use
-    // replace() so "back" doesn't return to the receipt of a finished transfer.
     router.replace('/');
   };
 
