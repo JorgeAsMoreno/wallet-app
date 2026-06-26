@@ -12,6 +12,10 @@ export function ResultStep() {
   if (!outcome) return null;
 
   const handleGoHome = () => {
+    // Don't reset() here: it would flip `step` back to 'amount' synchronously and
+    // flash the first wizard step before the navigation completes. The store is
+    // already cleaned on TransferPage unmount (see transfer/page.tsx). We use
+    // replace() so "back" doesn't return to the receipt of a finished transfer.
     router.replace('/');
   };
 
