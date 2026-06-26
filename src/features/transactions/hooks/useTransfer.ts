@@ -1,15 +1,20 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { submitTransfer } from '../services';
 import { mapToTransferOutcome } from '../domain/mappers';
 import { useTransferStore } from '../store/transferStore';
-import type { Cents } from '@/core/money';
+import { subtractCents, type Cents } from '@/core/money';
+import { accountQueryKey } from '@/features/wallet/hooks/useAccount';
+import { movementsQueryKey } from '@/features/wallet/hooks/useMovements';
+import type { AccountResponse, MovementsResponse } from '@/core/api/contracts';
+import type { Movement } from '@/features/wallet/domain/types';
 import type { Contact } from '../domain/types';
 
 export function useTransfer() {
   const setOutcome = useTransferStore((s) => s.setOutcome);
   const idempotencyKey = useTransferStore((s) => s.idempotencyKey);
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async ({
@@ -33,6 +38,36 @@ export function useTransfer() {
     },
     onSuccess: (outcome) => {
       setOutcome(outcome);
+
+      if (outcome.status !== 'success') return;
+
+      const { receipt } = outcome;
+
+      queryClient.setQueryData<AccountResponse>(accountQueryKey, (prev) =>
+        prev
+          ? {
+              ...prev,
+              account: {
+                ...prev.account,
+                balance: subtractCents(prev.account.balance, receipt.amount),
+              },
+            }
+          : prev,
+      );
+
+      const movement: Movement = {
+        id: receipt.id,
+        direction: 'debit',
+        amount: receipt.amount,
+        counterparty: receipt.recipient.name,
+        description: 'Transferencia enviada',
+        status: 'completed',
+        createdAt: receipt.createdAt,
+      };
+
+      queryClient.setQueryData<MovementsResponse>(movementsQueryKey, (prev) =>
+        prev ? { ...prev, items: [movement, ...prev.items] } : prev,
+      );
     },
   });
 }

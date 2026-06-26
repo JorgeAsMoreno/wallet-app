@@ -9,5 +9,6 @@ export function useMovements() {
   return useQuery({
     queryKey: movementsQueryKey,
     queryFn: fetchMovements,
+    staleTime: 1000 * 30,
   });
 }
