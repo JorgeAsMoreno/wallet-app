@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { accountQueryKey } from '@/features/wallet/hooks/useAccount';
 import { movementsQueryKey } from '@/features/wallet/hooks/useMovements';
-import { useTransferStore } from '@/features/transactions/store/transferStore';
+import { useTransferStore, WIZARD_STEP } from '@/features/transactions/store/transferStore';
 
 export function ResultStep() {
   const outcome = useTransferStore((s) => s.outcome);
@@ -25,7 +25,7 @@ export function ResultStep() {
   };
 
   const handleRetry = () => {
-    goTo('summary');
+    goTo(WIZARD_STEP.Summary);
   };
 
   // --- Éxito ---
@@ -78,7 +78,7 @@ export function ResultStep() {
           Disponible: {formatMoney(outcome.available)}
         </p>
         <div className={styles.actions}>
-          <Button onClick={() => goTo('amount')}>Cambiar monto</Button>
+          <Button onClick={() => goTo(WIZARD_STEP.Amount)}>Cambiar monto</Button>
           <Button variant="secondary" onClick={handleGoHome}>Ir al inicio</Button>
         </div>
       </div>

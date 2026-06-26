@@ -1,0 +1,54 @@
+@use '@/styles/mixins' as *;
+
+.wrapper {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  text-align: center;
+  background-color: var(--color-background);
+}
+
+.icon {
+  font-size: var(--text-3xl);
+}
+
+.title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-gray-900);
+}
+
+.description {
+  font-size: var(--text-sm);
+  color: var(--color-gray-600);
+  max-width: 28ch;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+  background-color: var(--color-primary-600);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+
+  &:hover {
+    background-color: var(--color-primary-700);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}

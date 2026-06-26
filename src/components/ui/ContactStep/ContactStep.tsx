@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button/Button';
 import { Skeleton } from '@/components/ui/Skeleton/Skeleton';
 import styles from './ContactStep.module.scss';
 import { useState } from 'react';
-import { useTransferStore } from '@/features/transactions/store/transferStore';
+import { useTransferStore, WIZARD_STEP } from '@/features/transactions/store/transferStore';
 import { useContacts, useCreateContact } from '@/features/transactions/hooks/useContacts';
 import { newContactSchema, NewContactValues } from '@/features/transactions/schema';
 import { Contact } from '@/features/transactions/domain/types';
@@ -40,7 +40,7 @@ export function ContactStep() {
 
   return (
     <div className={styles.wrapper}>
-      <button className={styles.backButton} onClick={() => goTo('amount')}>
+      <button className={styles.backButton} onClick={() => goTo(WIZARD_STEP.Amount)}>
         ← Volver
       </button>
 
