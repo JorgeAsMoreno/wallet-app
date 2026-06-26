@@ -2,7 +2,14 @@ import { create } from 'zustand';
 import type { Contact, TransferOutcome } from '../domain/types';
 import type { Cents } from '@/core/money';
 
-export type WizardStep = 'amount' | 'contact' | 'summary' | 'result';
+export const WIZARD_STEP = {
+  Amount: 'amount',
+  Contact: 'contact',
+  Summary: 'summary',
+  Result: 'result',
+} as const;
+
+export type WizardStep = (typeof WIZARD_STEP)[keyof typeof WIZARD_STEP];
 
 interface TransferState {
   // Datos del wizard
@@ -24,7 +31,7 @@ interface TransferState {
 }
 
 const INITIAL_STATE = {
-  step: 'amount' as WizardStep,
+  step: WIZARD_STEP.Amount as WizardStep,
   amount: null,
   recipient: null,
   idempotencyKey: null,
@@ -37,10 +44,10 @@ const newIdempotencyKey = () =>
 export const useTransferStore = create<TransferState>((set) => ({
   ...INITIAL_STATE,
 
-  setAmount: (amount) => set({ amount, step: 'contact' }),
+  setAmount: (amount) => set({ amount, step: WIZARD_STEP.Contact }),
   setRecipient: (recipient) =>
-    set({ recipient, idempotencyKey: newIdempotencyKey(), step: 'summary' }),
-  setOutcome: (outcome) => set({ outcome, step: 'result' }),
+    set({ recipient, idempotencyKey: newIdempotencyKey(), step: WIZARD_STEP.Summary }),
+  setOutcome: (outcome) => set({ outcome, step: WIZARD_STEP.Result }),
   goTo: (step) => set({ step }),
   reset: () => set(INITIAL_STATE),
 }));

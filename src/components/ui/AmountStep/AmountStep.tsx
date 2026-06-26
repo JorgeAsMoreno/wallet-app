@@ -25,6 +25,20 @@ export function AmountStep() {
     formState: { errors },
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
+  const amountField = register('amount');
+
+  // Solo permitimos dígitos y un único separador decimal (. o ,).
+  // Filtra en vivo cualquier otro carácter (letras, símbolos, espacios…).
+  const sanitizeAmount: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const cleaned = e.target.value
+      .replace(/[^\d.,]/g, '')
+      .replace(/[.,]/g, (match, offset, full) =>
+        full.slice(0, offset).match(/[.,]/) ? '' : match,
+      );
+    e.target.value = cleaned;
+    amountField.onChange(e);
+  };
+
   const onSubmit = ({ amount: raw }: FormValues) => {
     const result = parseAmountToCents(raw);
 
@@ -60,8 +74,10 @@ export function AmountStep() {
           label="Monto"
           placeholder="ej. 150.00"
           inputMode="decimal"
+          autoComplete="off"
           error={errors.amount?.message}
-          {...register('amount')}
+          {...amountField}
+          onChange={sanitizeAmount}
         />
         {balance !== null && (
           <p className={styles.balanceHint}>

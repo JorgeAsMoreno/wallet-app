@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { ApiErrorCode, type TransferRequest, type TransferResponse } from '@/core/api/contracts';
 import { cents } from '@/core/money';
-import { MOCK_ACCOUNT, MOCK_CONTACTS } from '@/mocks/data';
+import { MOCK_CONTACTS } from '@/mocks/data';
+import { getAccount, applyTransfer } from '@/mocks/state';
 import { simulateDelay, mockId, pickTransferScenario } from '@/mocks/utils';
 import { validateTransfer } from '@/features/transactions/domain/rules';
 
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
   const validation = validateTransfer({
     amount: cents(body.amount),
     recipient,
-    availableBalance: MOCK_ACCOUNT.balance,
+    availableBalance: getAccount().balance,
   });
 
   if (!validation.ok) {
@@ -53,7 +54,9 @@ export async function POST(request: Request) {
     );
   }
 
-  // --- Éxito ---
+  // --- Éxito: descontamos el saldo y registramos el movimiento ---
+  applyTransfer(cents(body.amount), validation.value.recipient.name);
+
   const response: TransferResponse = {
     receipt: {
       id: `txn-${mockId()}`,

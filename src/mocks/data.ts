@@ -8,8 +8,8 @@ import type { Contact } from '@/features/transactions/domain/types';
 // ---------------------------------------------------------------------------
 export const MOCK_USER: User = {
   id: 'user-001',
-  name: 'Carlos Mendoza',
-  email: 'carlos@example.com',
+  name: 'Jorge Solis',
+  email: 'jorge.solis@example.com',
   phone: '+5213121234567',
 };
 
@@ -23,7 +23,7 @@ export const MOCK_SESSION: Session = {
 // Cuenta
 // ---------------------------------------------------------------------------
 export const MOCK_ACCOUNT: Account = {
-  balance: cents(248750), // $2,487.50 MXN
+  balance: cents(2487500), // $24,875.00 MXN
   currency: 'MXN',
   holder: { id: MOCK_USER.id, name: MOCK_USER.name },
 };
