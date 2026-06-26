@@ -141,4 +141,4 @@ La estrategia de testing y el detalle por archivo están en [DECISIONS.md](DECIS
 
 ## 6. Tiempo de desarrollo
 
-- El challenge me tomo un dia en terminarlo Aprox (8 hrs). Desde la planeacion de como lo queria estructurar hasta pulir detalles visuales que iban apareciendo.
+- El challenge me tomo un dia en terminarlo Aprox (8 hrs). Desde la planeacion de como lo queria estructurar hasta pulir detalles visuales que iban apareciendo y documentacion.
