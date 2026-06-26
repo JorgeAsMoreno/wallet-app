@@ -9,7 +9,6 @@ import { useTransferStore, WIZARD_STEP } from '@/features/transactions/store/tra
 
 export function ResultStep() {
   const outcome = useTransferStore((s) => s.outcome);
-  const reset = useTransferStore((s) => s.reset);
   const goTo = useTransferStore((s) => s.goTo);
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -20,8 +19,11 @@ export function ResultStep() {
     // Invalidate cache so that the home page refreshes balance and movements
     queryClient.invalidateQueries({ queryKey: accountQueryKey });
     queryClient.invalidateQueries({ queryKey: movementsQueryKey });
-    reset();
-    router.push('/');
+    // Don't reset() here: it would flip `step` back to 'amount' synchronously and
+    // flash the first wizard step before the navigation completes. The store is
+    // already cleaned on TransferPage unmount (see transfer/page.tsx). We use
+    // replace() so "back" doesn't return to the receipt of a finished transfer.
+    router.replace('/');
   };
 
   const handleRetry = () => {
