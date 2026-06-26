@@ -117,7 +117,7 @@ export function validateTransfer(candidate): Result<ValidatedTransfer, TransferV
 
 **Dónde se aplican:**
 
-- **Cliente** — `AmountStep` valida monto y saldo en el momento del input para dar feedback inmediato; `validateTransfer` agrupa todas las violaciones.
+- **Cliente** — `AmountStep` valida monto y saldo en el momento del input para dar feedback inmediato; `amountIsPositive/balanceIsSufficient` agrupa todas las violaciones.
 - **Servidor** — [`api/transfer/route.ts`](src/app/api/transfer/route.ts) **vuelve a ejecutar** `validateTransfer` antes de descontar el saldo. El cliente nunca es la única línea de defensa:
 
 ```ts
